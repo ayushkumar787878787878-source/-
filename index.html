@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spend Ayush's ₹5 Trillion - Money Spending Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+/* ==================== Global Styles ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #6366f1;
+    --secondary-color: #8b5cf6;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --dark-bg: #0f172a;
+    --card-bg: #1e293b;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --border-color: #334155;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+#confetti-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.header {
+    background: rgba(30, 41, 59, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 20px 0;
+    border-bottom: 2px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: var(--shadow-lg);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo i {
+    font-size: 36px;
+    color: var(--primary-color);
+    animation: rotate 3s linear infinite;
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.logo h1 {
+    font-size: 28px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.header-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.icon-btn {
+    background: var(--card-bg);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    padding: 12px 18px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.3s ease;
+}
+
+.icon-btn:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+.money-dashboard {
+    padding: 40px 0;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.money-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: var(--shadow-lg);
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.money-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+}
+
+.card-icon {
+    font-size: 48px;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+
+.card-content h3 {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.money-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.net-worth-card .money-value {
+    color: var(--success-color);
+}
+
+.net-worth-card.warning .money-value {
+    color: var(--warning-color);
+}
+
+.net-worth-card.danger .money-value {
+    color: var(--danger-color);
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.progress-bar-container {
+    position: relative;
+    width: 100%;
+    height: 30px;
+    background: rgba(15, 23, 42, 0.5);
+    border-radius: 15px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--success-color), var(--primary-color));
+    border-radius: 15px;
+    transition: width 0.5s ease, background 0.3s ease;
+    position: relative;
+}
+
+.progress-bar.warning {
+    background: linear-gradient(90deg, var(--warning-color), #fb923c);
+}
+
+.progress-bar.danger {
+    background: linear-gradient(90deg, var(--danger-color), #dc2626);
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text-primary);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.daily-challenge {
+    padding: 20px 0;
+}
+
+.challenge-card {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+    border: 2px solid var(--primary-color);
+    border-radius: 20px;
+    padding: 25px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: var(--shadow-lg);
+}
+
+.challenge-badge {
+    font-size: 48px;
+    color: #fbbf24;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.challenge-content {
+    flex: 1;
+}
+
+.challenge-content h3 {
+    font-size: 20px;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.challenge-content p {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+}
+
+.challenge-progress-bar {
+    width: 100%;
+    height: 12px;
+    background: rgba(15, 23, 42, 0.5);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 5px;
+}
+
+.challenge-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #fbbf24, #f59e0b);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+#challenge-status {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.achievement-popup {
+    position: fixed;
+    top: 100px;
+    right: -400px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: var(--shadow-lg);
+    z-index: 2000;
+    transition: right 0.5s ease;
+    max-width: 350px;
+}
+
+.achievement-popup.show {
+    right: 20px;
+}
+
+.achievement-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.achievement-content i {
+    font-size: 48px;
+    color: #fbbf24;
+}
+
+.achievement-content h4 {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.achievement-content p {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.controls-section {
+    margin: 30px 0;
+}
+
+.category-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.category-btn {
+    background: var(--card-bg);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    padding: 12px 24px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.category-btn:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.category-btn.active {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-color: transparent;
+}
+
+.sort-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.sort-select {
+    flex: 1;
+    max-width: 300px;
+    background: var(--card-bg);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.sort-select:hover {
+    border-color: var(--primary-color);
+}
+
+.undo-btn {
+    background: var(--card-bg);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    padding: 12px 24px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.undo-btn:hover:not(:disabled) {
+    background: var(--warning-color);
+    border-color: var(--warning-color);
+    transform: translateY(-2px);
+}
+
+.undo-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    padding-bottom: 50px;
+}
+
+.item-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.item-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    border-color: var(--primary-color);
+}
+
+.item-card.legendary {
+    border: 2px solid #fbbf24;
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+}
+
+.item-card.legendary::before {
+    content: '⭐ LEGENDARY';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    z-index: 10;
+}
+
+.item-image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    background: rgba(15, 23, 42, 0.5);
+}
+
+.item-content {
+    padding: 20px;
+}
+
+.item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.item-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.3;
+}
+
+.item-category {
+    background: rgba(99, 102, 241, 0.2);
+    color: var(--primary-color);
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.item-price {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--success-color);
+    margin-bottom: 15px;
+}
+
+.item-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.buy-btn {
+    flex: 1;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+}
+
+.buy-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+}
+
+.buy-btn:active {
+    transform: scale(0.98);
+}
+
+.buy-btn.shake {
+    animation: shake 0.5s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+.quantity-display {
+    background: rgba(15, 23, 42, 0.5);
+    padding: 8px 15px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    min-width: 60px;
+    text-align: center;
+}
+
+.quantity-display.has-items {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--success-color);
+}
+
+.history-sidebar {
+    position: fixed;
+    right: -400px;
+    top: 0;
+    width: 380px;
+    height: 100vh;
+    background: var(--card-bg);
+    box-shadow: -5px 0 20px rgba(0, 0, 0, 0.5);
+    transition: right 0.4s ease;
+    z-index: 1500;
+    display: flex;
+    flex-direction: column;
+}
+
+.history-sidebar.open {
+    right: 0;
+}
+
+.toggle-history-btn {
+    position: absolute;
+    left: -50px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 10px 0 0 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+}
+
+.toggle-history-btn:hover {
+    background: var(--secondary-color);
+    padding-left: 20px;
+}
+
+.history-content {
+    padding: 30px 20px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.history-content h3 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.history-item {
+    background: rgba(15, 23, 42, 0.5);
+    padding: 15px;
+    border-radius: 12px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.history-item h4 {
+    font-size: 16px;
+    margin-bottom: 5px;
+    color: var(--text-primary);
+}
+
+.history-item p {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.no-history {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 20px;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 3000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--card-bg);
+    border-radius: 30px;
+    padding: 60px;
+    text-align: center;
+    max-width: 600px;
+    box-shadow: var(--shadow-lg);
+    border: 3px solid var(--primary-color);
+    animation: modalPop 0.5s ease;
+}
+
+@keyframes modalPop {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.celebration-icon {
+    font-size: 120px;
+    color: #fbbf24;
+    margin-bottom: 20px;
+    animation: bounce 1s infinite;
+}
+
+.modal-content h2 {
+    font-size: 48px;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.modal-content h3 {
+    font-size: 32px;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+}
+
+.modal-content p {
+    font-size: 18px;
+    color: var(--text-secondary);
+    margin-bottom: 30px;
+}
+
+.final-stats {
+    background: rgba(15, 23, 42, 0.5);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+}
+
+.final-stats p {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.restart-btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    padding: 18px 40px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.restart-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.5);
+}
+
+@media (max-width: 768px) {
+    .logo h1 {
+        font-size: 20px;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .money-value {
+        font-size: 22px;
+    }
+
+    .category-filters {
+        justify-content: center;
+    }
+
+    .category-btn {
+        font-size: 13px;
+        padding: 10px 18px;
+    }
+
+    .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .modal-content {
+        padding: 40px 30px;
+    }
+
+    .modal-content h2 {
+        font-size: 36px;
+    }
+
+    .history-sidebar {
+        width: 100%;
+        right: -100%;
+    }
+
+    .toggle-history-btn {
+        left: 0;
+        top: auto;
+        bottom: 20px;
+        border-radius: 10px;
+        padding: 12px 20px;
+        flex-direction: row;
+    }
+}
+
+@media (max-width: 480px) {
+    .items-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .sort-controls {
+        flex-direction: column;
+    }
+    
+    .sort-select {
+        max-width: 100%;
+    }
+}
+    </style>
+</head>
+<body>
+    <canvas id="confetti-canvas"></canvas>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <h1>Spend Ayush's Money</h1>
+                </div>
+                <div class="header-controls">
+                    <button id="sound-toggle" class="icon-btn" title="Toggle Sound">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                    <button id="reset-game" class="icon-btn" title="Reset Game">
+                        <i class="fas fa-redo"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="money-dashboard">
+        <div class="container">
+            <div class="dashboard-grid">
+                <div class="money-card net-worth-card">
+                    <div class="card-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Remaining Money</h3>
+                        <p id="remaining-money" class="money-value">₹5,00,00,00,00,000</p>
+                    </div>
+                </div>
+                <div class="money-card spent-card">
+                    <div class="card-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Total Spent</h3>
+                        <p id="total-spent" class="money-value">₹0</p>
+                    </div>
+                </div>
+                <div class="money-card progress-card">
+                    <div class="card-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Progress</h3>
+                        <div class="progress-bar-container">
+                            <div id="progress-bar" class="progress-bar"></div>
+                            <span id="progress-text" class="progress-text">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="daily-challenge" id="daily-challenge">
+        <div class="container">
+            <div class="challenge-card">
+                <div class="challenge-badge">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="challenge-content">
+                    <h3>Daily Challenge</h3>
+                    <p id="challenge-description">Buy 5 Tech Items</p>
+                    <div class="challenge-progress-bar">
+                        <div id="challenge-progress" class="challenge-progress-fill"></div>
+                    </div>
+                    <span id="challenge-status">0/5</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="achievement-popup" class="achievement-popup">
+        <div class="achievement-content">
+            <i class="fas fa-award"></i>
+            <div>
+                <h4>Achievement Unlocked!</h4>
+                <p id="achievement-text"></p>
+            </div>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="controls-section">
+                <div class="category-filters">
+                    <button class="category-btn active" data-category="all">
+                        <i class="fas fa-th"></i> All Items
+                    </button>
+                    <button class="category-btn" data-category="tech">
+                        <i class="fas fa-laptop"></i> Tech
+                    </button>
+                    <button class="category-btn" data-category="vehicles">
+                        <i class="fas fa-car"></i> Vehicles
+                    </button>
+                    <button class="category-btn" data-category="luxury">
+                        <i class="fas fa-gem"></i> Luxury
+                    </button>
+                    <button class="category-btn" data-category="real-estate">
+                        <i class="fas fa-building"></i> Real Estate
+                    </button>
+                    <button class="category-btn" data-category="gaming">
+                        <i class="fas fa-gamepad"></i> Gaming
+                    </button>
+                    <button class="category-btn" data-category="sports">
+                        <i class="fas fa-baseball-ball"></i> Sports
+                    </button>
+                    <button class="category-btn" data-category="space">
+                        <i class="fas fa-rocket"></i> Space
+                    </button>
+                </div>
+
+                <div class="sort-controls">
+                    <select id="sort-select" class="sort-select">
+                        <option value="default">Default Order</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="name">Name: A to Z</option>
+                    </select>
+                    <button id="undo-btn" class="undo-btn" title="Undo Last Purchase">
+                        <i class="fas fa-undo"></i> Undo
+                    </button>
+                </div>
+            </div>
+
+            <div id="items-grid" class="items-grid">
+            </div>
+        </div>
+    </main>
+
+    <div id="endgame-modal" class="modal">
+        <div class="modal-content celebration">
+            <div class="celebration-icon">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <h2>🎉 Congratulations! 🎉</h2>
+            <h3>You Broke Ayush!</h3>
+            <p>You've successfully spent all ₹5 Trillion!</p>
+            <div class="final-stats">
+                <p><strong>Total Items Purchased:</strong> <span id="final-items"></span></p>
+                <p><strong>Achievements Unlocked:</strong> <span id="final-achievements"></span></p>
+            </div>
+            <button id="restart-btn" class="restart-btn">
+                <i class="fas fa-redo"></i> Play Again
+            </button>
+        </div>
+    </div>
+
+    <div id="history-sidebar" class="history-sidebar">
+        <button id="toggle-history" class="toggle-history-btn">
+            <i class="fas fa-history"></i>
+            <span>Purchase History</span>
+        </button>
+        <div class="history-content">
+            <h3>Purchase History</h3>
+            <div id="history-list" class="history-list">
+                <p class="no-history">No purchases yet!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+// ==================== Game Configuration ====================
+const STARTING_NET_WORTH = 500000000000;
+let remainingMoney = STARTING_NET_WORTH;
+let totalSpent = 0;
+let purchaseHistory = [];
+let achievements = [];
+let soundEnabled = true;
+
+let dailyChallenge = {
+    description: "Buy 5 Tech Items",
+    type: "category",
+    target: 5,
+    progress: 0,
+    category: "tech",
+    completed: false
+};
+
+const items = [
+    { name: "iPhone 15 Pro Max", price: 159900, image: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=400", category: "tech", rarity: "common" },
+    { name: "MacBook Pro M3", price: 249900, image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400", category: "tech", rarity: "common" },
+    { name: "Samsung Galaxy S24 Ultra", price: 129999, image: "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=400", category: "tech", rarity: "common" },
+    { name: "iPad Pro 12.9\"", price: 109900, image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400", category: "tech", rarity: "common" },
+    { name: "Sony PlayStation 5", price: 54990, image: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=400", category: "gaming", rarity: "common" },
+    { name: "Xbox Series X", price: 52990, image: "https://images.unsplash.com/photo-1621259182978-fbf93132d53d?w=400", category: "gaming", rarity: "common" },
+    { name: "Nintendo Switch OLED", price: 34999, image: "https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=400", category: "gaming", rarity: "common" },
+    { name: "Apple Watch Ultra 2", price: 89900, image: "https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=400", category: "tech", rarity: "common" },
+    { name: "Samsung QLED 85\" TV", price: 399999, image: "https://images.unsplash.com/photo-1593784991095-a205069470b6?w=400", category: "tech", rarity: "rare" },
+    { name: "Gaming PC (RTX 5090)", price: 850000, image: "https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=400", category: "gaming", rarity: "legendary" },
+    { name: "Apple Vision Pro 2", price: 349900, image: "https://images.unsplash.com/photo-1617802690992-5952a53610a0?w=400", category: "tech", rarity: "legendary" },
+    { name: "Sony A7R V Camera", price: 349999, image: "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=400", category: "tech", rarity: "rare" },
+    { name: "Canon EOS R5", price: 329999, image: "https://images.unsplash.com/photo-1606980707165-c8a6d2e3b472?w=400", category: "tech", rarity: "rare" },
+    { name: "DJI Mavic 3 Pro Drone", price: 199900, image: "https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=400", category: "tech", rarity: "rare" },
+    { name: "Tesla Powerwall", price: 1200000, image: "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=400", category: "tech", rarity: "rare" },
+    { name: "Honda City", price: 1200000, image: "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400", category: "vehicles", rarity: "common" },
+    { name: "Toyota Fortuner", price: 3500000, image: "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=400", category: "vehicles", rarity: "common" },
+    { name: "BMW 3 Series", price: 5500000, image: "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400", category: "vehicles", rarity: "rare" },
+    { name: "Mercedes-Benz S-Class", price: 18500000, image: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=400", category: "vehicles", rarity: "rare" },
+    { name: "Audi R8", price: 23500000, image: "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=400", category: "vehicles", rarity: "legendary" },
+    { name: "Lamborghini Huracán", price: 32000000, image: "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=400", category: "vehicles", rarity: "legendary" },
+    { name: "Ferrari F8 Tributo", price: 45000000, image: "https://images.unsplash.com/photo-1592198084033-aade902d1aae?w=400", category: "vehicles", rarity: "legendary" },
+    { name: "Rolls-Royce Phantom", price: 95000000, image: "https://images.unsplash.com/photo-1563720360172-67b8f3dce741?w=400", category: "vehicles", rarity: "legendary" },
+    { name: "Bugatti Chiron", price: 310000000, image: "https://images.unsplash.com/photo-1566023888772-68c3f6193447?w=400", category: "vehicles", rarity: "legendary" },
+    { name: "Private Helicopter", price: 450000000, image: "https://images.unsplash.com/photo-1504834636679-cd3acd047c06?w=400", category: "vehicles", rarity: "legendary" },
+    { name: "Private Jet (Cessna)", price: 2500000000, image: "https://images.unsplash.com/photo-1540962351504-03099e0a754b?w=400", category: "vehicles", rarity: "legendary" },
+    { name: "Yacht (50ft)", price: 15000000000, image: "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=400", category: "vehicles", rarity: "legendary" },
+    { name: "Superyacht (200ft)", price: 150000000000, image: "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?w=400", category: "vehicles", rarity: "legendary" },
+    { name: "Rolex Submariner", price: 950000, image: "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=400", category: "luxury", rarity: "rare" },
+    { name: "Rolex Diamond Edition", price: 5500000, image: "https://images.unsplash.com/photo-1622434641406-a158123450f9?w=400", category: "luxury", rarity: "legendary" },
+    { name: "Patek Philippe Watch", price: 8500000, image: "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?w=400", category: "luxury", rarity: "legendary" },
+    { name: "Louis Vuitton Bag", price: 250000, image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400", category: "luxury", rarity: "common" },
+    { name: "Gucci Suit", price: 450000, image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400", category: "luxury", rarity: "rare" },
+    { name: "Diamond Ring (2 Carat)", price: 3500000, image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400", category: "luxury", rarity: "legendary" },
+    { name: "Gold Bar (1 KG)", price: 6500000, image: "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=400", category: "luxury", rarity: "legendary" },
+    { name: "Silver Bar (10 KG)", price: 750000, image: "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=400", category: "luxury", rarity: "rare" },
+    { name: "Steinway Grand Piano", price: 12500000, image: "https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=400", category: "luxury", rarity: "legendary" },
+    { name: "Picasso Painting Replica", price: 50000000, image: "https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=400", category: "luxury", rarity: "legendary" },
+    { name: "1 BHK Apartment Mumbai", price: 8500000, image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400", category: "real-estate", rarity: "common" },
+    { name: "3 BHK Flat Delhi", price: 25000000, image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400", category: "real-estate", rarity: "common" },
+    { name: "Luxury Villa Goa", price: 150000000, image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400", category: "real-estate", rarity: "rare" },
+    { name: "Penthouse Mumbai", price: 500000000, image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400", category: "real-estate", rarity: "legendary" },
+    { name: "Private Island Maldives", price: 25000000000, image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400", category: "real-estate", rarity: "legendary" },
+    { name: "Luxury Hotel Chain", price: 100000000000, image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400", category: "real-estate", rarity: "legendary" },
+    { name: "Skyscraper NYC", price: 250000000000, image: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=400", category: "real-estate", rarity: "legendary" },
+    { name: "5-Star Resort", price: 50000000000, image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400", category: "real-estate", rarity: "legendary" },
+    { name: "Shopping Mall", price: 75000000000, image: "https://images.unsplash.com/photo-1555529902-5261145633bf?w=400", category: "real-estate", rarity: "legendary" },
+    { name: "Gaming Chair", price: 35000, image: "https://images.unsplash.com/photo-1593115057653-98964611995b?w=400", category: "gaming", rarity: "common" },
+    { name: "Mechanical Keyboard", price: 15000, image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400", category: "gaming", rarity: "common" },
+    { name: "Gaming Mouse", price: 8000, image: "https://images.unsplash.com/photo-1527814050087-3793815479db?w=400", category: "gaming", rarity: "common" },
+    { name: "VR Headset (Meta Quest 3)", price: 54990, image: "https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?w=400", category: "gaming", rarity: "rare" },
+    { name: "PlayStation 6 (Pre-order)", price: 65000, image: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=400", category: "gaming", rarity: "legendary" },
+    { name: "Gaming Setup Complete", price: 500000, image: "https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=400", category: "gaming", rarity: "rare" },
+    { name: "Esports Arena", price: 5000000000, image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400", category: "gaming", rarity: "legendary" },
+    { name: "Gaming Tournament Sponsorship", price: 10000000000, image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=400", category: "gaming", rarity: "legendary" },
+    { name: "Mumbai Indians IPL Team", price: 90000000000, image: "https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=400", category: "sports", rarity: "legendary" },
+    { name: "Chennai Super Kings IPL Team", price: 85000000000, image: "https://images.unsplash.com/photo-1624526267942-ab0ff8a3e972?w=400", category: "sports", rarity: "legendary" },
+    { name: "Royal Challengers Bangalore", price: 82000000000, image: "https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=400", category: "sports", rarity: "legendary" },
+    { name: "Cricket Stadium", price: 15000000000, image: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=400", category: "sports", rarity: "legendary" },
+    { name: "Football Club", price: 50000000000, image: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400", category: "sports", rarity: "legendary" },
+    { name: "Tennis Court", price: 25000000, image: "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=400", category: "sports", rarity: "rare" },
+    { name: "Golf Course", price: 5000000000, image: "https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400", category: "sports", rarity: "legendary" },
+    { name: "SpaceX Starship Ticket", price: 5000000000, image: "https://images.unsplash.com/photo-1516849841032-87cbac4d88f7?w=400", category: "space", rarity: "legendary" },
+    { name: "Space Station Module", price: 50000000000, image: "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=400", category: "space", rarity: "legendary" },
+    { name: "Satellite", price: 25000000000, image: "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=400", category: "space", rarity: "legendary" },
+    { name: "Moon Land (1 Acre)", price: 10000000000, image: "https://images.unsplash.com/photo-1446941611757-91d2c3bd3d45?w=400", category: "space", rarity: "legendary" },
+    { name: "Mars Colonization Investment", price: 100000000000, image: "https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=400", category: "space", rarity: "legendary" },
+    { name: "Asteroid Mining Rights", price: 200000000000, image: "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=400", category: "space", rarity: "legendary" },
+    { name: "Electric Scooter", price: 125000, image: "https://images.unsplash.com/photo-1600682494316-ca175eaf5531?w=400", category: "vehicles", rarity: "common" },
+    { name: "Smart Home System", price: 250000, image: "https://images.unsplash.com/photo-1558002038-1055907df827?w=400", category: "tech", rarity: "rare" },
+    { name: "Home Theater System", price: 450000, image: "https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=400", category: "tech", rarity: "rare" },
+    { name: "Espresso Machine", price: 85000, image: "https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=400", category: "luxury", rarity: "common" },
+    { name: "Wine Collection (100 Bottles)", price: 1500000, image: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400", category: "luxury", rarity: "rare" },
+    { name: "Gym Equipment Set", price: 350000, image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400", category: "luxury", rarity: "common" },
+    { name: "Swimming Pool", price: 5000000, image: "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=400", category: "real-estate", rarity: "rare" },
+    { name: "Designer Clothes Collection", price: 2500000, image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400", category: "luxury", rarity: "rare" },
+    { name: "Luxury Watch Collection", price: 15000000, image: "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=400", category: "luxury", rarity: "legendary" },
+    { name: "Art Gallery", price: 25000000000, image: "https://images.unsplash.com/photo-1536924940846-227afb31e2a5?w=400", category: "real-estate", rarity: "legendary" },
+    { name: "Movie Production Company", price: 50000000000, image: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=400", category: "luxury", rarity: "legendary" },
+    { name: "Record Label", price: 30000000000, image: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400", category: "luxury", rarity: "legendary" },
+    { name: "Tech Startup Investment", price: 10000000000, image: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=400", category: "tech", rarity: "legendary" },
+    { name: "Cryptocurrency Portfolio", price: 5000000000, image: "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=400", category: "tech", rarity: "legendary" },
+    { name: "Solar Farm", price: 15000000000, image: "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=400", category: "tech", rarity: "legendary" },
+    { name: "Wind Farm", price: 20000000000, image: "https://images.unsplash.com/photo-1532601224476-15c79f2f7a51?w=400", category: "tech", rarity: "legendary" },
+    { name: "University Campus", price: 100000000000, image: "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=400", category: "real-estate", rarity: "legendary" },
+    { name: "Hospital Complex", price: 75000000000, image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=400", category: "real-estate", rarity: "legendary" },
+    { name: "Theme Park", price: 125000000000, image: "https://images.unsplash.com/photo-1598984290298-71b592246e2d?w=400", category: "real-estate", rarity: "legendary" },
+    { name: "Casino Resort", price: 80000000000, image: "https://images.unsplash.com/photo-1596838132731-3301c3fd4317?w=400", category: "real-estate", rarity: "legendary" }
+];
+
+let itemQuantities = {};
+items.forEach(item => {
+    itemQuantities[item.name] = 0;
+});
+
+const sounds = {
+    buy: new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFAdGn+DyvmwhBTGH0fPTgjMGHGS56+GOYQ4LTabjvmkhBSl+zPLZiToIGWS56+iOYQ4LTajjvmkhBSt/zPLXiToIF2O56+mNYQ4KTKXiv2khBSl+zPLXiToIF2O56+mNYQ4KTKXiv2khBSl+zPLXiToIF2O56+mNYQ4KTKXiv2khBSl+zPLXiToIF2O56+mNYQ4KTKXiv2khBSl+zPLXiToIF2O56+mNYQ4KTKXiv2khBSl+zPLXiToIF2O56+mNYQ4KTKXiv2khBSl+zPLXiToIF2O56+mNYQ4KTKXiv2khBSl+zPLXiToIF2O56+mNYQ4KTKXiv2khBSl+zPLXiToIF2O56+mNYQ4KTKXiv2khBSl+zPLXiToIF2O56+mNYQ4KTKXiv2khBSl+zPLXiToIF2O56+mNYQ4KTKXiv2khBSl+zPLXiToIF2O56+mNYQ4KTKXiv2khBSl+zPLXiToI'),
+    error: new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFAdGn+DyvmwhBTGH0fPTgjMGHGS56+GOYQ4LTabjvmkhBSl+zPLZiToIGWS56+iOYQ4LTajjvmkhBSt/zPLXiToIF2O56+mNYQ4KTKXiv2khBSl+zPLXiToIF2O56+mNYQ4KTKXiv2khBSl+zPLXiToIF2O56+mNYQ4KTKXiv2khBSl+zPLXiToIF2O56+mNYQ4KTKXiv2khBSl+zPLXiToIF2O56+mNYQ4KTKXiv2khBSl+zPLXiToIF2O56+mNYQ4KTKXiv2khBSl+zPLXiToIF2O56+mNYQ4KTKXiv2khBSl+zPLXiToIF2O56+mNYQ4KTKXiv2khBSl+zPLXiToIF2O56+mNYQ4KTKXiv2khBSl+zPLXiToIF2O56+mNYQ4KTKXiv2khBSl+zPLXiToIF2O56+mNYQ4KTKXiv2khBSl+zPLXiToIF2O56+mNYQ4KTKXiv2khBSl+zPLXiToI')
+};
+
+function initGame() {
+    loadGameState();
+    renderItems();
+    updateMoneyDisplay();
+    updateProgressBar();
+    setupEventListeners();
+    generateDailyChallenge();
+}
+
+function loadGameState() {
+    const savedState = localStorage.getItem('spendAyushMoney');
+    if (savedState) {
+        const state = JSON.parse(savedState);
+        remainingMoney = state.remainingMoney || STARTING_NET_WORTH;
+        totalSpent = state.totalSpent || 0;
+        itemQuantities = state.itemQuantities || {};
+        purchaseHistory = state.purchaseHistory || [];
+        achievements = state.achievements || [];
+        dailyChallenge = state.dailyChallenge || dailyChallenge;
+    }
+}
+
+function saveGameState() {
+    const state = {
+        remainingMoney,
+        totalSpent,
+        itemQuantities,
+        purchaseHistory,
+        achievements,
+        dailyChallenge
+    };
+    localStorage.setItem('spendAyushMoney', JSON.stringify(state));
+}
+
+function formatCurrency(amount) {
+    const absAmount = Math.abs(amount);
+    if (absAmount >= 10000000) {
+        const crores = absAmount / 10000000;
+        return `₹${crores.toFixed(2)} Cr`;
+    } else if (absAmount >= 100000) {
+        const lakhs = absAmount / 100000;
+        return `₹${lakhs.toFixed(2)} L`;
+    } else {
+        return `₹${absAmount.toLocaleString('en-IN')}`;
+    }
+}
+
+let currentCategory = 'all';
+let currentSort = 'default';
+
+function renderItems(category = 'all', sortBy = 'default') {
+    currentCategory = category;
+    currentSort = sortBy;
+    
+    let filteredItems = category === 'all' 
+        ? items 
+        : items.filter(item => item.category === category);
+    
+    if (sortBy === 'price-high') {
+        filteredItems.sort((a, b) => b.price - a.price);
+    } else if (sortBy === 'price-low') {
+        filteredItems.sort((a, b) => a.price - b.price);
+    } else if (sortBy === 'name') {
+        filteredItems.sort((a, b) => a.name.localeCompare(b.name));
+    }
+    
+    const itemsGrid = document.getElementById('items-grid');
+    itemsGrid.innerHTML = '';
+    
+    filteredItems.forEach(item => {
+        const itemCard = createItemCard(item);
+        itemsGrid.appendChild(itemCard);
+    });
+}
+
+function createItemCard(item) {
+    const card = document.createElement('div');
+    card.className = `item-card ${item.rarity}`;
+    
+    const quantity = itemQuantities[item.name] || 0;
+    
+    card.innerHTML = `
+        <img src="${item.image}" alt="${item.name}" class="item-image" loading="lazy">
+        <div class="item-content">
+            <div class="item-header">
+                <h3 class="item-name">${item.name}</h3>
+                <span class="item-category">${item.category}</span>
+            </div>
+            <p class="item-price">${formatCurrency(item.price)}</p>
+            <div class="item-actions">
+                <button class="buy-btn" onclick="buyItem('${item.name}', ${item.price}, '${item.category}')">
+                    <i class="fas fa-shopping-cart"></i> Buy
+                </button>
+                <div class="quantity-display ${quantity > 0 ? 'has-items' : ''}">
+                    ${quantity > 0 ? `×${quantity}` : '0'}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    return card;
+}
+
+function buyItem(itemName, price, category) {
+    if (remainingMoney >= price) {
+        remainingMoney -= price;
+        totalSpent += price;
+        itemQuantities[itemName] = (itemQuantities[itemName] || 0) + 1;
+        
+        purchaseHistory.push({
+            item: itemName,
+            price: price,
+            time: new Date().toLocaleTimeString()
+        });
+        
+        if (soundEnabled) {
+            sounds.buy.play();
+        }
+        
+        if (price >= 1000000) {
+            triggerConfetti();
+            if (price >= 10000000) {
+                screenShake();
+            }
+        }
+        
+        updateMoneyDisplay();
+        updateProgressBar();
+        renderItems(currentCategory, currentSort);
+        updatePurchaseHistory();
+        checkDailyChallenge(category);
+        checkAchievements();
+        saveGameState();
+        
+        if (remainingMoney <= 0) {
+            endGame();
+        }
+    } else {
+        if (soundEnabled) {
+            sounds.error.play();
+        }
+        
+        const button = event.target.closest('.buy-btn');
+        button.classList.add('shake');
+        setTimeout(() => button.classList.remove('shake'), 500);
+        
+        showNotification('Not enough money!', 'error');
+    }
+}
+
+function updateMoneyDisplay() {
+    const remainingMoneyEl = document.getElementById('remaining-money');
+    const totalSpentEl = document.getElementById('total-spent');
+    const netWorthCard = document.querySelector('.net-worth-card');
+    
+    remainingMoneyEl.textContent = formatCurrency(remainingMoney);
+    totalSpentEl.textContent = formatCurrency(totalSpent);
+    
+    const percentageLeft = (remainingMoney / STARTING_NET_WORTH) * 100;
+    
+    netWorthCard.classList.remove('warning', 'danger');
+    if (percentageLeft <= 20) {
+        netWorthCard.classList.add('danger');
+    } else if (percentageLeft <= 50) {
+        netWorthCard.classList.add('warning');
+    }
+}
+
+function updateProgressBar() {
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+    
+    const percentage = (totalSpent / STARTING_NET_WORTH) * 100;
+    progressBar.style.width = `${percentage}%`;
+    progressText.textContent = `${percentage.toFixed(1)}%`;
+    
+    progressBar.classList.remove('warning', 'danger');
+    if (percentage >= 70) {
+        progressBar.classList.add('danger');
+    } else if (percentage >= 40) {
+        progressBar.classList.add('warning');
+    }
+    
+    if (percentage >= 100) {
+        triggerConfetti();
+    }
+}
+
+function triggerConfetti() {
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    const confetti = [];
+    const colors = ['#6366f1', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#fbbf24'];
+    
+    for (let i = 0; i < 100; i++) {
+        confetti.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height - canvas.height,
+            r: Math.random() * 6 + 4,
+            d: Math.random() * 10 + 5,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            tilt: Math.random() * 10 - 10
+        });
+    }
+    
+    function drawConfetti() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        confetti.forEach((c, i) => {
+            ctx.beginPath();
+            ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+            ctx.fillStyle = c.color;
+            ctx.fill();
+            
+            c.y += c.d;
+            c.x += Math.sin(c.tilt);
+            
+            if (c.y > canvas.height) {
+                confetti.splice(i, 1);
+            }
+        });
+        
+        if (confetti.length > 0) {
+            requestAnimationFrame(drawConfetti);
+        }
+    }
+    
+    drawConfetti();
+}
+
+function screenShake() {
+    document.body.style.animation = 'shake 0.5s';
+    setTimeout(() => {
+        document.body.style.animation = '';
+    }, 500);
+}
+
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+        20%, 40%, 60%, 80% { transform: translateX(10px); }
+    }
+`;
+document.head.appendChild(style);
+
+function updatePurchaseHistory() {
+    const historyList = document.getElementById('history-list');
+    
+    if (purchaseHistory.length === 0) {
+        historyList.innerHTML = '<p class="no-history">No purchases yet!</p>';
+        return;
+    }
+    
+    historyList.innerHTML = '';
+    
+    const recentPurchases = purchaseHistory.slice(-10).reverse();
+    
+    recentPurchases.forEach(purchase => {
+        const historyItem = document.createElement('div');
+        historyItem.className = 'history-item';
+        historyItem.innerHTML = `
+            <h4>${purchase.item}</h4>
+            <p>${formatCurrency(purchase.price)} at ${purchase.time}</p>
+        `;
+        historyList.appendChild(historyItem);
+    });
+}
+
+function undoLastPurchase() {
+    if (purchaseHistory.length === 0) {
+        showNotification('No purchases to undo!', 'error');
+        return;
+    }
+    
+    const lastPurchase = purchaseHistory.pop();
+    remainingMoney += lastPurchase.price;
+    totalSpent -= lastPurchase.price;
+    itemQuantities[lastPurchase.item]--;
+    
+    updateMoneyDisplay();
+    updateProgressBar();
+    renderItems(currentCategory, currentSort);
+    updatePurchaseHistory();
+    saveGameState();
+    
+    showNotification('Purchase undone!', 'success');
+}
+
+function generateDailyChallenge() {
+    const challenges = [
+        { description: "Buy 5 Tech Items", type: "category", target: 5, category: "tech" },
+        { description: "Buy 3 Vehicles", type: "category", target: 3, category: "vehicles" },
+        { description: "Spend ₹1 Crore in 2 Minutes", type: "spending", target: 10000000, time: 120 },
+        { description: "Buy 10 Items Total", type: "total", target: 10 },
+        { description: "Buy 2 Legendary Items", type: "rarity", target: 2, rarity: "legendary" }
+    ];
+    
+    const lastChallengeDate = localStorage.getItem('lastChallengeDate');
+    const today = new Date().toDateString();
+    
+    if (lastChallengeDate !== today) {
+        const randomChallenge = challenges[Math.floor(Math.random() * challenges.length)];
+        dailyChallenge = { ...randomChallenge, progress: 0, completed: false };
+        localStorage.setItem('lastChallengeDate', today);
+        saveGameState();
+    }
+    
+    updateChallengeDisplay();
+}
+
+function checkDailyChallenge(category) {
+    if (dailyChallenge.completed) return;
+    
+    if (dailyChallenge.type === "category" && category === dailyChallenge.category) {
+        dailyChallenge.progress++;
+    } else if (dailyChallenge.type === "total") {
+        dailyChallenge.progress++;
+    }
+    
+    if (dailyChallenge.progress >= dailyChallenge.target) {
+        dailyChallenge.completed = true;
+        completeDailyChallenge();
+    }
+    
+    updateChallengeDisplay();
+    saveGameState();
+}
+
+function updateChallengeDisplay() {
+    document.getElementById('challenge-description').textContent = dailyChallenge.description;
+    document.getElementById('challenge-status').textContent = 
+        `${dailyChallenge.progress}/${dailyChallenge.target}`;
+    
+    const progressPercentage = (dailyChallenge.progress / dailyChallenge.target) * 100;
+    document.getElementById('challenge-progress').style.width = `${progressPercentage}%`;
+}
+
+function completeDailyChallenge() {
+    const bonus = 100000000;
+    remainingMoney += bonus;
+    showNotification(`Challenge Complete! Bonus: ${formatCurrency(bonus)}`, 'success');
+    triggerConfetti();
+    saveGameState();
+}
+
+function checkAchievements() {
+    const achievementsList = [
+        { id: 'first_purchase', name: 'First Step', condition: () => totalSpent > 0 },
+        { id: 'tech_king', name: 'Tech King', condition: () => countCategoryPurchases('tech') >= 10 },
+        { id: 'vehicle_god', name: 'Vehicle God', condition: () => countCategoryPurchases('vehicles') >= 5 },
+        { id: 'billion_buyer', name: 'Billion Rupee Buyer', condition: () => totalSpent >= 1000000000 },
+        { id: 'ayush_the_don', name: 'Ayush the Don', condition: () => totalSpent >= 5000000000 }
+    ];
+    
+    achievementsList.forEach(achievement => {
+        if (!achievements.includes(achievement.id) && achievement.condition()) {
+            achievements.push(achievement.id);
+            showAchievement(achievement.name);
+            saveGameState();
+        }
+    });
+}
+
+function countCategoryPurchases(category) {
+    return purchaseHistory.filter(p => {
+        const item = items.find(i => i.name === p.item);
+        return item && item.category === category;
+    }).length;
+}
+
+function showAchievement(name) {
+    const popup = document.getElementById('achievement-popup');
+    document.getElementById('achievement-text').textContent = name;
+    popup.classList.add('show');
+    
+    setTimeout(() => {
+        popup.classList.remove('show');
+    }, 3000);
+}
+
+function showNotification(message, type = 'info') {
+    console.log(`${type.toUpperCase()}: ${message}`);
+}
+
+function endGame() {
+    const modal = document.getElementById('endgame-modal');
+    document.getElementById('final-items').textContent = purchaseHistory.length;
+    document.getElementById('final-achievements').textContent = achievements.length;
+    
+    modal.classList.add('show');
+    triggerConfetti();
+    
+    setTimeout(triggerConfetti, 500);
+    setTimeout(triggerConfetti, 1000);
+}
+
+function setupEventListeners() {
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            const category = e.target.dataset.category;
+            renderItems(category, currentSort);
+        });
+    });
+    
+    document.getElementById('sort-select').addEventListener('change', (e) => {
+        renderItems(currentCategory, e.target.value);
+    });
+    
+    document.getElementById('undo-btn').addEventListener('click', undoLastPurchase);
+    
+    const soundToggle = document.getElementById('sound-toggle');
+    soundToggle.addEventListener('click', () => {
+        soundEnabled = !soundEnabled;
+        soundToggle.innerHTML = soundEnabled 
+            ? '<i class="fas fa-volume-up"></i>' 
+            : '<i class="fas fa-volume-mute"></i>';
+    });
+    
+    document.getElementById('reset-game').addEventListener('click', () => {
+        if (confirm('Are you sure you want to reset the game?')) {
+            resetGame();
+        }
+    });
+    
+    document.getElementById('restart-btn').addEventListener('click', () => {
+        resetGame();
+        document.getElementById('endgame-modal').classList.remove('show');
+    });
+    
+    const historyToggle = document.getElementById('toggle-history');
+    const historySidebar = document.getElementById('history-sidebar');
+    
+    historyToggle.addEventListener('click', () => {
+        historySidebar.classList.toggle('open');
+    });
+}
+
+function resetGame() {
+    remainingMoney = STARTING_NET_WORTH;
+    totalSpent = 0;
+    purchaseHistory = [];
+    achievements = [];
+    itemQuantities = {};
+    items.forEach(item => {
+        itemQuantities[item.name] = 0;
+    });
+    
+    saveGameState();
+    updateMoneyDisplay();
+    updateProgressBar();
+    renderItems();
+    updatePurchaseHistory();
+    generateDailyChallenge();
+}
+
+window.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
